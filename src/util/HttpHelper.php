@@ -9,7 +9,7 @@
 class HttpHelper
 {
     /**
-     *    作用：以post方式提交xml到对应的接口url
+     *  作用：以post方式提交xml到对应的接口url
      */
     static function postXmlCurl($url, $body, $second = 30)
     {
@@ -54,4 +54,67 @@ class HttpHelper
             return false;
         }
     }
+
+    /**
+     * 长url转为短url
+     * @param $long_url
+     * @return string
+     */
+    static function convertToShortUrl($long_url)
+    {
+        $url = trim($long_url);
+        $url = urlencode($url);
+
+        $short_url = '';
+        if($url){
+            $short_url = self::sinaShortenUrl($url);
+        }
+
+        return $short_url;
+    }
+
+    /**
+     * 根据长网址获取短网址
+     * @param $long_url
+     * @return string
+     */
+    private static function sinaShortenUrl($long_url)
+    {
+        // 拼接请求地址，此地址你可以在官方的文档中查看到
+        $sina_appkey = '31641035';
+        $url = 'http://api.t.sina.com.cn/short_url/shorten.json?source=' . $sina_appkey . '&url_long=' . $long_url;
+
+        // 获取请求结果
+
+        // 设置附加HTTP头
+        $add_head = array("Content-type: application/json");
+        // 初始化curl，当然，你也可以用fsockopen代替
+        $curl_obj = curl_init();
+        // 设置网址
+        curl_setopt($curl_obj, CURLOPT_URL, $url);
+        // 附加Head内容
+        curl_setopt($curl_obj, CURLOPT_HTTPHEADER, $add_head);
+        // 是否输出返回头信息
+        curl_setopt($curl_obj, CURLOPT_HEADER, 0);
+        // 将curl_exec的结果返回
+        curl_setopt($curl_obj, CURLOPT_RETURNTRANSFER, 1);
+        // 设置超时时间
+        curl_setopt($curl_obj, CURLOPT_TIMEOUT, 30);
+        // 执行
+        $result = curl_exec($curl_obj);
+        // 关闭curl回话
+        curl_close($curl_obj);
+
+        // 解析json
+        $json = json_decode($result);
+
+        // 异常情况返回false
+        if (isset($json->error) || !isset($json[0]->url_short) || $json[0]->url_short == '') {
+            return '';
+        } else {
+            return $json[0]->url_short;
+        }
+    }
+
+
 }
