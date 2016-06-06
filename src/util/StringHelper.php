@@ -100,5 +100,43 @@ class StringHelper
         return $array_data;
     }
 
+    static function toString($object)
+    {
+        if (is_array($object) || is_object($object)) {
+            return json_encode($object, JSON_UNESCAPED_UNICODE);
+        }
+
+        $str = trim($object);
+        return $str;
+    }
+
+    static function isPresent($object)
+    {
+        return !self::isBlank($object);
+    }
+
+    static function isBlank($object)
+    {
+        if ($object || (is_numeric($object) && 0 == $object)) {
+            return false;
+        }
+        return true;
+    }
+
+    static function checkDirExists($filename)
+    {
+
+        if ('/' == substr($filename, -1) && !file_exists($filename)) {
+            mkdir($filename, 0777, true);
+            chmod($filename, 0777);
+        } else {
+            if (!file_exists(dirname($filename))) {
+                mkdir(dirname($filename), 0777, true);
+                chmod(dirname($filename), 0777);
+            }
+        }
+
+        return true;
+    }
 
 }

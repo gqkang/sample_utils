@@ -1,3 +1,5 @@
+* 1.0.2
+    * 增加time方法
 * 1.0.1
     * 增加HttpHelper方法: convertToShortUrl 长url转为短url
 * 1.0.0
